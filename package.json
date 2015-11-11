@@ -1,0 +1,26 @@
+{
+  "name": "platform-hardware",
+  "version": "0.0.1",
+  "description": "Hardware Monitor",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "async": "^1.5.0",
+    "express": "^4.13.3",
+    "morgan": "^1.6.1",
+    "udev": "cheery/node-udev#master"
+  },
+  "engines": {
+    "node": "0.12.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/experimental-platform/platform-hardware"
+  },
+  "keywords": [
+    "node",
+    "heroku"
+  ]
+}
