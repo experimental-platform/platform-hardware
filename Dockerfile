@@ -2,7 +2,7 @@ FROM experimentalplatform/ubuntu:latest
 
 RUN curl -sL https://deb.nodesource.com/setup | sudo bash - && \
     apt-get update && \
-    apt-get install -y build-essential curl nodejs python2.7 libudev-dev && \
+    apt-get install -y build-essential curl nodejs python2.7 libudev-dev iproute2 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
