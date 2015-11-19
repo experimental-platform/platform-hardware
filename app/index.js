@@ -1,5 +1,6 @@
 var path = require('path'),
   udev = require('udev'),
+  fs = require('fs'),
   monitor = udev.monitor(),
   express = require('express'),
   app = express(),
@@ -110,8 +111,10 @@ var main = function () {
       next();
     });
   });
-  http.listen(process.env.PORT || 3000, function () {
-    console.log('listening on: ' + (process.env.PORT || 3000));
+  var sockpath = '/socketdir/hardware.sock';
+  http.listen(sockpath, function () {
+    fs.chmodSync(sockpath, 0777);
+    console.log('listening on: ' + sockpath);
   });
 };
 
