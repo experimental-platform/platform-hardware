@@ -90,7 +90,7 @@ var main = function () {
   startMonitoring();
   // enable logging
   app.use(morgan('combined'));
-  app.get('/', function (req, res, next) {
+  app.get('/v1/hardware/list', function (req, res, next) {
     getDeviceList(function (err, deviceList) {
       var device, result;
       if (!req.query.hasOwnProperty('identifier')) {
