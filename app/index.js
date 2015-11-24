@@ -6,7 +6,8 @@ var path = require('path'),
   app = express(),
   http = require('http').Server(app),
   async = require("async"),
-  morgan = require('morgan');
+  morgan = require('morgan'),
+  spawn = require("child_process").spawn;
 
 
 var createID = function (device) {
@@ -109,6 +110,20 @@ var main = function () {
         return;
       }
       next();
+    });
+  });
+  app.get('/v1/network/default/ip', function(req, res, next) {
+    var iproute = spawn("ip", ["route", "get", "8.8.8.8"], [null, 'pipe', 'pipe']);
+    var awk = spawn("awk", ["{print $NF; exit}"], ['pipe', 'pipe', 'pipe'] );
+    iproute.on('exit', function(code, signal) {
+      if (code == 0) {
+        iproute.stdout.pipe(awk.stdin);
+        awk.on('exit', function(code, signal) {
+          if (code == 0) {
+            awk.stdout.pipe(res);
+          } else awk.stderr.pipe(res.status(404));
+        });
+      } else iproute.stderr.pipe(res.status(404));
     });
   });
   var sockpath = '/socketdir/hardware.sock';
