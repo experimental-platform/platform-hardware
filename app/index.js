@@ -1,11 +1,13 @@
 var path = require('path'),
   udev = require('udev'),
+  fs = require('fs'),
   monitor = udev.monitor(),
   express = require('express'),
   app = express(),
   http = require('http').Server(app),
   async = require("async"),
-  morgan = require('morgan');
+  morgan = require('morgan'),
+  spawn = require("child_process").spawn;
 
 
 var createID = function (device) {
@@ -89,7 +91,7 @@ var main = function () {
   startMonitoring();
   // enable logging
   app.use(morgan('combined'));
-  app.get('/', function (req, res, next) {
+  app.get('/v1/hardware/list', function (req, res, next) {
     getDeviceList(function (err, deviceList) {
       var device, result;
       if (!req.query.hasOwnProperty('identifier')) {
@@ -110,8 +112,24 @@ var main = function () {
       next();
     });
   });
-  http.listen(process.env.PORT || 3000, function () {
-    console.log('listening on: ' + (process.env.PORT || 3000));
+  app.get('/v1/network/default/ip', function(req, res, next) {
+    var iproute = spawn("ip", ["route", "get", "8.8.8.8"], [null, 'pipe', 'pipe']);
+    var awk = spawn("awk", ["{print $NF; exit}"], ['pipe', 'pipe', 'pipe'] );
+    iproute.on('exit', function(code, signal) {
+      if (code == 0) {
+        iproute.stdout.pipe(awk.stdin);
+        awk.on('exit', function(code, signal) {
+          if (code == 0) {
+            awk.stdout.pipe(res);
+          } else awk.stderr.pipe(res.status(404));
+        });
+      } else iproute.stderr.pipe(res.status(404));
+    });
+  });
+  var sockpath = '/socketdir/hardware.sock';
+  http.listen(sockpath, function () {
+    fs.chmodSync(sockpath, 0777);
+    console.log('listening on: ' + sockpath);
   });
 };
 
