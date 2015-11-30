@@ -29,12 +29,47 @@ var extendDeviceInfo = function (device, cb) {
 
 var filterSubsystem = function (device) {
   var blackList = [
-    'acpi', 'cpu', 'event_source', 'misc', 'thermal', 'pci', 'platform',
-    'memory', 'vc', 'pnp', 'mem', 'net', 'block', 'clockevents', 'input',
-    'pci_express', 'mei', 'pci_bus', 'watchdog', 'scsi', 'hwmon', 'graphics',
-    'ata_port', 'scsi_host', 'block', 'bsg', 'scsi_device', 'scsi_disk',
-    'ata_link', 'ata_device', 'serio', 'rtc', 'tpm', 'clocksource',
-    'machinecheck', 'node', 'bdi', 'dmi', 'vtconsole', 'workqueue'
+    'acpi',
+    'ata_device',
+    'ata_link',
+    'ata_port',
+    'bdi',
+    'block',
+    'block',
+    'bsg',
+    'clockevents',
+    'clocksource',
+    'cpu',
+    'dmi',
+    'event_source',
+    'graphics',
+    'hwmon',
+    'input',
+    'machinecheck',
+    'mei',
+    'mem',
+    'memory',
+    'misc',
+    'net',
+    'node',
+    'pci',
+    'pci_bus',
+    'pci_express',
+    'platform',
+    'pnp',
+    'rtc',
+    'scsi',
+    'scsi_device',
+    'scsi_disk',
+    'scsi_host',
+    'serio',
+    'thermal',
+    'tpm',
+    'usb',
+    'vc',
+    'vtconsole',
+    'watchdog',
+    'workqueue'
   ];
   // only devices represented in /dev that are not blacklisted
   return blackList.indexOf(device.SUBSYSTEM) <= -1 && device.hasOwnProperty('DEVNAME');
@@ -112,13 +147,13 @@ var main = function () {
       next();
     });
   });
-  app.get('/v1/network/default/ip', function(req, res, next) {
+  app.get('/v1/network/default/ip', function (req, res, next) {
     var iproute = spawn("ip", ["route", "get", "8.8.8.8"], [null, 'pipe', 'pipe']);
-    var awk = spawn("awk", ["{print $NF; exit}"], ['pipe', 'pipe', 'pipe'] );
-    iproute.on('exit', function(code, signal) {
+    var awk = spawn("awk", ["{print $NF; exit}"], ['pipe', 'pipe', 'pipe']);
+    iproute.on('exit', function (code, signal) {
       if (code == 0) {
         iproute.stdout.pipe(awk.stdin);
-        awk.on('exit', function(code, signal) {
+        awk.on('exit', function (code, signal) {
           if (code == 0) {
             awk.stdout.pipe(res);
           } else awk.stderr.pipe(res.status(404));
