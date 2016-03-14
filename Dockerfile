@@ -12,4 +12,4 @@ RUN npm install
 # ENV NODE_ENV production
 COPY app /app
 RUN mkdir /socketdir
-CMD node /app/index.js
+CMD ["dumb-init", "node", "/app/index.js"]
